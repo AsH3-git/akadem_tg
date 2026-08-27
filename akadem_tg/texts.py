@@ -1,0 +1,87 @@
+"""All user-facing strings, in Russian, in one place.
+
+Keeping them here (instead of scattered through bot.py) means the organizer
+can proofread / tweak wording without having to touch any logic.
+"""
+
+WELCOME = (
+    "Привет! Это бот квеста для студентов. 🎓\n\n"
+    "Выберите свой маршрут — ту последовательность секторов, которую вам "
+    "назвали организаторы (например, 2-1-3):"
+)
+
+ALREADY_STARTED = (
+    "Вы уже проходите квест. Если хотите начать заново, отправьте /reset."
+)
+
+ROUTE_CHOSEN = "Маршрут принят: {route}. Отправляю первую точку!"
+
+SIGHT_MESSAGE = (
+    "📍 Точка {n} из {total}\n\n"
+    "Координаты: `{lat}, {lon}`\n"
+    "🗺 [Открыть на карте]({maps_link})\n\n"
+    "Когда доберётесь до места, нажмите «Отправить фото»."
+)
+
+BTN_SEND_PHOTO = "📷 Отправить фото"
+BTN_SUPPORT = "🆘 Техническая поддержка"
+
+ASK_FOR_PHOTO = "Пришлите, пожалуйста, фото с этого места."
+
+PHOTO_NOT_EXPECTED = (
+    "Сначала нажмите «Отправить фото» под сообщением с координатами, а "
+    "затем присылайте фотографию."
+)
+
+PHOTO_RECEIVED = (
+    "Спасибо! Фото отправлено куратору на проверку. Ожидайте подтверждения — "
+    "как только куратор проверит фото, бот пришлёт следующую точку."
+)
+
+PHOTO_APPROVED_TO_STUDENT = "✅ Место засчитано! Переходим к следующей точке."
+
+PHOTO_REJECTED_TO_STUDENT = (
+    "❌ Это фото не подходит для этого места. Пришлите, пожалуйста, другое фото."
+)
+
+# Caption sent to the manager together with the forwarded photo.
+SUBMISSION_TO_MANAGER = (
+    "Новое фото на проверку\n"
+    "Студент: {student_name}\n"
+    "Сектор: {sector}\n"
+    "Точка: {sight_name}"
+)
+
+BTN_APPROVE = "✅ Подходит"
+BTN_REJECT = "❌ Не подходит"
+
+SUBMISSION_DECIDED_APPROVED = "✅ Подходит (проверено)"
+SUBMISSION_DECIDED_REJECTED = "❌ Не подходит (проверено)"
+
+NOT_YOUR_SUBMISSION = "Эта заявка закреплена за другим куратором."
+ALREADY_DECIDED = "Эта заявка уже проверена."
+
+MAIN_ROUTE_COMPLETE = (
+    "Вы завершили квест, молодцы! Можете возвращаться или попробовать "
+    "дойти до пары более удалённых, но не менее интересных мест."
+)
+
+BTN_FINISH = "🏁 Закончить квест"
+BTN_BONUS = "🔥 Еще места для самых смелых"
+
+FINISH_THANKS = "Спасибо за участие в квесте! До встречи 👋"
+
+BONUS_COMPLETE = "Молодец!"
+
+NEED_START = "Чтобы начать квест, отправьте /start."
+
+YOUR_ID = "Ваш Telegram id: `{id}`"
+
+STATS = (
+    "Пользователей всего: {total}\n"
+    "В процессе: {in_progress}\n"
+    "Завершили квест: {finished}\n"
+    "Заявок на проверке: {pending}"
+)
+
+NOT_ADMIN = "Эта команда недоступна."
