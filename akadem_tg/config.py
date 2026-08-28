@@ -49,9 +49,9 @@ BONUS_SECTOR = 4
 MANAGERS = {
     1: {"id": 1, "username": "manager_sector1", "name": "Куратор сектора 1"},
     2: {"id": 2, "username": "manager_sector2", "name": "Куратор сектора 2"},
-    3: {"id": 3, "username": "manager_sector3", "name": "Куратор сектора 3"},
+    3: {"id": 3, "username": "Igor_sector3", "name": "Куратор сектора 3"},
     # The bonus sector reuses sector 3's manager by default; change if needed.
-    4: {"id": 3, "username": "manager_sector3", "name": "Куратор доп. точек"},
+    4: {"id": 3, "username": "Igor_sector3", "name": "Куратор доп. точек"},
 }
 
 # Telegram user ids allowed to run the /stats admin command. Optional —
