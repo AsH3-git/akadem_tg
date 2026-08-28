@@ -104,18 +104,6 @@ def send_current_sight(chat_id: int) -> None:
     )
 
 
-def send_sector_link(chat_id: int, sector: int) -> None:
-    """Send the student a link to the sector's info website, if it has one."""
-    url = config.SECTOR_SITE_URLS.get(sector)
-    if not url:
-        return
-    bot.send_message(
-        chat_id,
-        texts.SECTOR_SITE_READY.format(sector=sector),
-        reply_markup=keyboards.sector_site_keyboard(url),
-    )
-
-
 def advance_after_approval(chat_id: int) -> None:
     """Called once a manager approves a photo: move the student on."""
     user = db.get_user(chat_id)
@@ -130,9 +118,6 @@ def advance_after_approval(chat_id: int) -> None:
             db.update_user(chat_id, sight_idx=next_sight_idx, state=db.STATE_IDLE)
             send_current_sight(chat_id)
             return
-
-        # Sector fully passed — send its info site before moving the student on.
-        send_sector_link(chat_id, sector)
 
         next_sector_idx = user["sector_idx"] + 1
         if next_sector_idx < len(route):
@@ -308,7 +293,7 @@ def handle_finish(call: types.CallbackQuery) -> None:
     db.update_user(chat_id, state=db.STATE_FINISHED)
     bot.answer_callback_query(call.id)
     bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=None)
-    bot.send_message(chat_id, texts.FINISH_THANKS)
+    bot.send_message(chat_id, texts.FINISH_THANKS, reply_markup=keyboards.final_site_keyboard(config.SITE_URL))
 
 
 @bot.callback_query_handler(func=lambda call: call.data == "bonus")
