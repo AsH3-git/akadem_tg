@@ -19,10 +19,13 @@ is kept in SQLite (db.py) so a bot restart doesn't lose anyone's progress.
 """
 
 import logging
+import os
+import random
 
 from telebot import types
 import telebot
 
+import articles
 import config
 import db
 import keyboards
@@ -39,6 +42,8 @@ bot = telebot.TeleBot(config.BOT_TOKEN, parse_mode=None)
 
 # Sector number -> list of Sight(lat, lon, name), loaded once at startup.
 SECTORS = parse_coordinates(config.COORDINATES_FILE)
+
+PICS_DIR = os.path.join(os.path.dirname(__file__), "pics")
 
 
 def validate_config() -> None:
@@ -103,6 +108,31 @@ def send_current_sight(chat_id: int) -> None:
     )
 
 
+def send_sector_recap(chat_id: int, sector: int) -> None:
+    """Send the student an article about the sector they just finished."""
+    data = articles.SECTOR_ARTICLES.get(sector)
+    if not data:
+        return
+
+    lines = [f"*{data['title']}*", "", data["intro"], ""]
+    for i, point in enumerate(data["points"], start=1):
+        lines.append(f"{i}. *{point['name']}*")
+        lines.append(point["desc"])
+        lines.append("")
+    bot.send_message(chat_id, "\n".join(lines), parse_mode="Markdown", disable_web_page_preview=True)
+
+    photo_paths = [p["photo"] for p in data["points"] if p["photo"]][:10]
+    if not photo_paths:
+        return
+    files = [open(os.path.join(PICS_DIR, rel), "rb") for rel in photo_paths]
+    try:
+        media = [types.InputMediaPhoto(f, caption=data["title"] if i == 0 else None) for i, f in enumerate(files)]
+        bot.send_media_group(chat_id, media)
+    finally:
+        for f in files:
+            f.close()
+
+
 def advance_after_approval(chat_id: int) -> None:
     """Called once a manager approves a photo: move the student on."""
     user = db.get_user(chat_id)
@@ -117,6 +147,9 @@ def advance_after_approval(chat_id: int) -> None:
             db.update_user(chat_id, sight_idx=next_sight_idx, state=db.STATE_IDLE)
             send_current_sight(chat_id)
             return
+
+        # Sector fully passed — send its article before moving the student on.
+        send_sector_recap(chat_id, sector)
 
         next_sector_idx = user["sector_idx"] + 1
         if next_sector_idx < len(route):
@@ -150,14 +183,31 @@ def handle_start(message: types.Message) -> None:
     if user["route"]:
         bot.send_message(chat_id, texts.ALREADY_STARTED)
         return
-    bot.send_message(chat_id, texts.WELCOME, reply_markup=keyboards.route_selection_keyboard())
+    bot.send_message(chat_id, texts.WELCOME)
 
 
 @bot.message_handler(commands=["reset"])
 def handle_reset(message: types.Message) -> None:
     chat_id = message.chat.id
     db.reset_user(chat_id)
-    bot.send_message(chat_id, texts.WELCOME, reply_markup=keyboards.route_selection_keyboard())
+    bot.send_message(chat_id, texts.WELCOME)
+
+
+@bot.message_handler(commands=["get_seq"])
+def handle_get_seq(message: types.Message) -> None:
+    chat_id = message.chat.id
+    user = db.get_user(chat_id)
+    if user is None:
+        bot.send_message(chat_id, texts.NEED_START)
+        return
+    if user["route"]:
+        bot.send_message(chat_id, texts.ALREADY_STARTED)
+        return
+
+    route = random.choice(keyboards.ROUTE_CODES)
+    db.update_user(chat_id, route=route, phase=db.PHASE_MAIN, sector_idx=0, sight_idx=0, state=db.STATE_IDLE)
+    bot.send_message(chat_id, texts.SEQ_ASSIGNED.format(route="-".join(route)), parse_mode="Markdown")
+    send_current_sight(chat_id)
 
 
 @bot.message_handler(commands=["id"])
@@ -182,17 +232,6 @@ def handle_stats(message: types.Message) -> None:
             pending=db.count_pending_submissions(),
         ),
     )
-
-
-@bot.callback_query_handler(func=lambda call: call.data.startswith("route:"))
-def handle_route_choice(call: types.CallbackQuery) -> None:
-    chat_id = call.message.chat.id
-    route = call.data.split(":", 1)[1]
-    db.update_user(chat_id, route=route, phase=db.PHASE_MAIN, sector_idx=0, sight_idx=0, state=db.STATE_IDLE)
-    bot.answer_callback_query(call.id)
-    bot.edit_message_reply_markup(chat_id, call.message.message_id, reply_markup=None)
-    bot.send_message(chat_id, texts.ROUTE_CHOSEN.format(route="-".join(route)))
-    send_current_sight(chat_id)
 
 
 @bot.callback_query_handler(func=lambda call: call.data == "photo:start")

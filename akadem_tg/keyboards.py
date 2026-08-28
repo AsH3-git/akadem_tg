@@ -7,17 +7,9 @@ from telebot import types
 import texts
 from config import MANAGERS
 
+# The 6 possible orderings of sectors 1-2-3, used to pick a random route
+# for each student in bot.handle_get_seq.
 ROUTE_CODES = ["".join(p) for p in permutations("123")]
-
-
-def route_selection_keyboard() -> types.InlineKeyboardMarkup:
-    markup = types.InlineKeyboardMarkup(row_width=3)
-    buttons = [
-        types.InlineKeyboardButton("-".join(code), callback_data=f"route:{code}")
-        for code in ROUTE_CODES
-    ]
-    markup.add(*buttons)
-    return markup
 
 
 def sight_keyboard(sector: int) -> types.InlineKeyboardMarkup:
