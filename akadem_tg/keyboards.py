@@ -24,6 +24,12 @@ def sight_keyboard(sector: int) -> types.InlineKeyboardMarkup:
     return markup
 
 
+def sector_site_keyboard(url: str) -> types.InlineKeyboardMarkup:
+    markup = types.InlineKeyboardMarkup(row_width=1)
+    markup.add(types.InlineKeyboardButton(texts.BTN_SECTOR_SITE, url=url))
+    return markup
+
+
 def manager_decision_keyboard(submission_id: int) -> types.InlineKeyboardMarkup:
     markup = types.InlineKeyboardMarkup(row_width=2)
     markup.add(

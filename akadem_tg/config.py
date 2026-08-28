@@ -57,3 +57,15 @@ MANAGERS = {
 # Telegram user ids allowed to run the /stats admin command. Optional —
 # leave empty to disable the command for everyone.
 ADMIN_IDS: set[int] = set()
+
+# --- Sector info websites -------------------------------------------------
+# Sent to a student as a link right after they finish all sights of that
+# sector. Hosted for free on GitHub Pages from a separate repo
+# (github.com/AsH3-git/akadem-quest-site) — see README for how to update
+# the site content and re-deploy. Sector 4 (bonus) has no site on purpose.
+_SITE_BASE = "https://ash3-git.github.io/akadem-quest-site"
+SECTOR_SITE_URLS = {
+    1: f"{_SITE_BASE}/sector1.html",
+    2: f"{_SITE_BASE}/sector2.html",
+    3: f"{_SITE_BASE}/sector3.html",
+}
